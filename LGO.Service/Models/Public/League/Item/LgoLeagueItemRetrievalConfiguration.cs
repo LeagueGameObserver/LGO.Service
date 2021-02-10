@@ -1,9 +1,12 @@
-﻿using LGO.Service.Models.Public.Enum;
+﻿using LGO.Service.Models.Internal;
+using LGO.Service.Models.Public.Enum;
 
 namespace LGO.Service.Models.Public.League.Item
 {
     public record LgoLeagueItemRetrievalConfiguration : LgoDataRetrievalConfiguration
     {
+        internal const string RequestExecutionContextPropertyName = nameof(LgoLeagueItemRetrievalConfiguration);
+        
         public override LgoDataRetrievalConfigurationType Type => LgoDataRetrievalConfigurationType.LeagueItem;
 
         public bool IncludeName { get; init; } = true;
@@ -20,5 +23,20 @@ namespace LGO.Service.Models.Public.League.Item
                                                                                 IncludePrice = false,
                                                                                 IncludeImage = false,
                                                                             };
+
+        internal static LgoLeagueItemRetrievalConfiguration GetCurrentOrDefault()
+        {
+            return GetOrDefaultFromContext(RequestExecutionContext.GetCurrentOrDefault());
+        }
+        
+        internal static LgoLeagueItemRetrievalConfiguration GetOrDefaultFromContext(RequestExecutionContext context)
+        {
+            if (context.TryGetProperty<LgoLeagueItemRetrievalConfiguration>(RequestExecutionContextPropertyName, out var configuration))
+            {
+                return configuration;
+            }
+
+            return IncludeEverything;
+        }
     }
 }
